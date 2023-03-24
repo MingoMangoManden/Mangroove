@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+
+# dumb mac file
+.DS_Store
