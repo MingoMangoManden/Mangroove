@@ -13,7 +13,7 @@ using namespace std;
  * PROTOTYPES
  */
 
-
+void render();
 void close_window(GLFWwindow *window);
 void process_input(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -25,7 +25,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 string TITLE = "Mangroove v0.0.2";
 int WIDTH = 800;
 int HEIGHT = 800;
-
 
 int main()
 {

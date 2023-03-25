@@ -34,3 +34,4 @@
 # dumb mac file
 .DS_Store
 builds
+libs/glfw
