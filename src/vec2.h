@@ -23,6 +23,15 @@ class vec2
 			y -= a.y;
 		}
 		
-		// multiply
-		// divide
+		void multiply(vec2 a)
+		{
+			x *= a.x;
+			y *= a.y;
+		}
+
+		void divide(vec2 a)
+		{
+			x /= a.x;
+			y /= a.y;
+		}
 };
