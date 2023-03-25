@@ -19,12 +19,12 @@ ifeq ($(OS), Darwin)
 endif
 
 # Windows
-ifeq ($(UNAME_S), Windows_NT)
+ifeq ($(OS), Windows_NT)
 	LDFLAGS += -lopengl32 -lgdi32
 endif
 
 #fresh: clean glfw glad all
-all: clean glfw glad all
+all: clean glfw glad engine run
 
 clean:
 	$(info $(INFO) CLEANING FOR FRESHNESS)
