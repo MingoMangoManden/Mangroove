@@ -13,6 +13,9 @@ using namespace std;
  * PROTOTYPES
  */
 
+
+void close_window(GLFWwindow *window);
+void process_input(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 /*
@@ -56,8 +59,10 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
-		glClearColor(0.13f, 0.13f, 0.13f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		process_input(window);
+		
+		//update();
+		render();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -65,6 +70,25 @@ int main()
 
 	glfwTerminate();
 	return 0;
+}
+
+void render()
+{
+	glClearColor(0.13f, 0.13f, 0.13f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void process_input(GLFWwindow *window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		close_window(window);
+	}
+}
+
+void close_window(GLFWwindow *window)
+{
+	glfwSetWindowShouldClose(window, true);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) // update viewport
