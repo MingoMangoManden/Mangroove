@@ -40,7 +40,7 @@ glad:
 glfw:
 	$(info $(INFO) COMPILING GLFW)
 	cd libs && git clone https://github.com/glfw/glfw.git
-	cd libs/glfw && cmake . && make
+	cd libs/glfw && cmake . -G "Unix Makefiles" && make
 
 engine:
 	$(info $(OS))
