@@ -2,7 +2,7 @@ ifndef VERBOSE
 .SILENT:
 endif
 
-OS = $(shell uname -s)
+OS = $(shell uname)
 
 FLAGS = -g
 IFLAGS = -Ilibs/glfw/include -Ilibs/glad/include
@@ -13,13 +13,13 @@ OUT = builds/Mangroove
 
 INFO = [ INFO ]:
 
-# Mac - didn't work for some reason
+# Mac
 ifeq ($(OS), Darwin)
 	LDFLAGS += -framework OpenGL -framework IOKit -framework CoreVideo -framework Cocoa
 endif
 
 # Windows
-ifeq ($(OS), Windows_NT)
+ifneq (,$(findstring MINGW64_NT, $(OS)))
 	LDFLAGS += -lopengl32 -lgdi32
 endif
 
