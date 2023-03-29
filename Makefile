@@ -8,7 +8,7 @@ FLAGS = -g
 IFLAGS = -Ilibs/glfw/include -Ilibs/glad/include
 LDFLAGS = libs/glfw/src/libglfw3.a libs/glad/src/glad.o
 
-SRC = src/window.cpp
+SRC = src/main.c
 OUT = builds/Mangroove
 
 INFO = [ INFO ]:
@@ -48,11 +48,12 @@ engine:
 
 	mkdir -p builds
 
-	g++ -o $(OUT) $(SRC) $(IFLAGS) $(LDFLAGS) $(FLAGS)
+	gcc -o $(OUT) $(SRC) $(IFLAGS) $(LDFLAGS) $(FLAGS)
 
 	@echo
 
 run:
 	$(info $(INFO) RUNNING PROGRAM)
+	$(info )
 	./$(OUT)
 	@echo
