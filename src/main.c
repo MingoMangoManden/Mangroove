@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
-//#include <iostream>
-//#include <string>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -28,11 +26,8 @@ const char *fragment_shader_source =
 	"uniform vec2 resolution;\n"
 	"void main() {\n"
 		//"FragColor = vec4(0.18f, 0.576f, 0.235f, 1.0f);\n"
-		//"FragColor = vec4(sin(time), sin(time*-1), 0.0f, 1.0f);\n"
 		
 		"vec2 st = gl_FragCoord.xy/resolution;\n"
-		//"float distance = distance(st, vec2(sin(time), sin(time * -1)));\n"
-
 		"vec3 color = vec3(st.x, st.y, sin(time));\n"
 		"FragColor = vec4(color, 1.0);\n"
 	"}\n";
@@ -229,7 +224,7 @@ void process_input(GLFWwindow *window)
 		lock = false;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_W) && lock == false)
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && lock == false)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, (wf_mode) ? GL_LINE : GL_FILL);
 		wf_mode = !wf_mode;
