@@ -12,38 +12,6 @@ const char *TITLE = "Mangroove v0.0.4";
 const int WIDTH = 800;
 const int HEIGHT = 800;
 
-char *vertex_shader_source =
-	"#version 410 core\n"
-
-	"layout (location = 0) in vec3 pos;\n"
-	"layout (location = 1) in vec3 acolor;\n"
-
-	"out vec3 v_color;\n"
-
-	"void main() {\n"
-		"gl_Position = vec4(pos, 1.0);\n"
-		"v_color = acolor;\n"
-	"}\n";
-
-char *fragment_shader_source =
-	"#version 410 core\n"
-
-	"out vec4 FragColor;\n"
-
-	//"in vec4 gl_FragCoord;\n"
-	"in vec3 v_color;"
-
-	"uniform float time;\n"
-	"uniform vec2 resolution;\n"
-	"void main() {\n"
-		//"FragColor = vec4(0.18f, 0.576f, 0.235f, 1.0f);\n"
-		
-		//"vec2 st = gl_FragCoord.xy/resolution;\n"
-		//"vec3 color = vec3(st.x, st.y, sin(time));\n"
-
-		"FragColor = vec4(v_color, 1.0);\n"
-	"}\n";
-
 float vertices[] = {
 	
 	// vertices          // colors
