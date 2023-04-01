@@ -8,7 +8,7 @@ FLAGS = -g
 IFLAGS = -Ilibs/glfw/include -Ilibs/glad/include
 LDFLAGS = libs/glfw/src/libglfw3.a libs/glad/src/glad.o
 
-SRC = src/main.c
+SRC = src/*.c
 OUT = builds/Mangroove
 
 INFO = [ INFO ]:

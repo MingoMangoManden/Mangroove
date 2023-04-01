@@ -6,63 +6,75 @@
 #include <GLFW/glfw3.h>
 
 #include "main.h"
+#include "shader.h"
 
 const char *TITLE = "Mangroove v0.0.4";
 const int WIDTH = 800;
 const int HEIGHT = 800;
 
-const char *vertex_shader_source =
+char *vertex_shader_source =
 	"#version 410 core\n"
+
 	"layout (location = 0) in vec3 pos;\n"
+	"layout (location = 1) in vec3 acolor;\n"
+
+	"out vec3 v_color;\n"
+
 	"void main() {\n"
 		"gl_Position = vec4(pos, 1.0);\n"
+		"v_color = acolor;\n"
 	"}\n";
 
-const char *fragment_shader_source =
+char *fragment_shader_source =
 	"#version 410 core\n"
+
 	"out vec4 FragColor;\n"
-	"in vec4 gl_FragCoord;\n"
+
+	//"in vec4 gl_FragCoord;\n"
+	"in vec3 v_color;"
+
 	"uniform float time;\n"
 	"uniform vec2 resolution;\n"
 	"void main() {\n"
 		//"FragColor = vec4(0.18f, 0.576f, 0.235f, 1.0f);\n"
 		
-		"vec2 st = gl_FragCoord.xy/resolution;\n"
-		"vec3 color = vec3(st.x, st.y, sin(time));\n"
-		"FragColor = vec4(color, 1.0);\n"
+		//"vec2 st = gl_FragCoord.xy/resolution;\n"
+		//"vec3 color = vec3(st.x, st.y, sin(time));\n"
+
+		"FragColor = vec4(v_color, 1.0);\n"
 	"}\n";
 
 float vertices[] = {
-
-	-1.0f, -1.0f, 0.0f,
-	1.0f, -1.0f, 0.0f,
-	-1.0f, 1.0f, 0.0f,
-
-	1.0f, -1.0f, 0.0f,
-	1.0f, 1.0f, 0.0f,
-	-1.0f, 1.0f, 0.0f
 	
-	// []
-	/*-0.2f, -0.2f, 0.0f,
-	0.2f, -0.2f, 0.0f,
-	-0.2f, 0.2f, 0.0f,
-
-	0.2f, -0.2f, 0.0f,
-	0.2f, 0.2f, 0.0f,
-	-0.2f, 0.2f, 0.0f*/
+	// vertices          // colors
+	1.0f,  1.0f, 0.0f,   1.0f, 0.0f, 0.0f, // top right
+    1.0f, -1.0f, 0.0f,   0.0f, 1.0f, 0.0f, // bottom right
+    -1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f, // bottom left
+    -1.0f, 1.0f, 0.0f,   0.0f, 1.0f, 1.0f, // top left
 	
 	// ><
-	/*-1.0f, 1.0f, 0.0f,
-	-1.0f, -1.0f, 0.0f,
-	0.0f, 0.0f, 0.0f,
+	// vertices          // colors
+	/*-1.0f, 1.0f, 0.0f,   1.0f, 0.0f, 0.0f, // top left
+	-1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f, // bottom left
+	0.0f, 0.0f, 0.0f,    0.0f, 0.0f, 1.0f, // middle --
+	1.0f, 1.0f, 0.0f,    1.0f, 0.0f, 0.0f, // top right
+	1.0f, -1.0f, 0.0f,    0.0f, 1.0f, 0.0f // bottom right*/
 
-	1.0f, 1.0f, 0.0f,
-	0.0f, 0.0f, 0.0f,
-	1.0f, -1.0f, 0.0f*/
+};
+
+
+unsigned int indices[] = {
+	1, 2, 3,
+	3, 0, 1
+
+	// ><
+	/*0, 1, 2,
+	3, 2, 4*/
 };
 
 int main()
 {
+	
 	glfwInit();
 
 	GLFWwindow* window = create_window();
@@ -80,31 +92,44 @@ int main()
 	glViewport(0, 0, WIDTH, HEIGHT);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // update viewport when window is resized
 
-	// VBO
+	// EBO, VBO & VAO
+	
+	// 
+	unsigned int EBO;
+	glGenBuffers(1, &EBO);
+	
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
 	
-	// VAO
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
+	
+	// use VAO for VBO & EBO
 	glBindVertexArray(VAO);
-
-	// VBO
+	
+	// vertices -> VBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	// indices -> EBO
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+	// in vec3 pos in vertex shader
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
 
-	
-	// Shader stuff
-	unsigned int vertex_shader;
+	// in vec3 color in vertex shader
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	// compile shaders
+	/*unsigned int vertex_shader, fragment_shader;
+
 	vertex_shader = compile_shader(vertex_shader_source, GL_VERTEX_SHADER);
-	
-	unsigned int fragment_shader;
 	fragment_shader = compile_shader(fragment_shader_source, GL_FRAGMENT_SHADER);
 	
-
+	// create shader program
 	unsigned int shader_program;
 	shader_program = create_program(vertex_shader, fragment_shader);
 	
@@ -112,7 +137,10 @@ int main()
 	glUseProgram(shader_program);
 	int loc = glGetUniformLocation(shader_program, "resolution");
 	glUniform2f(loc, WIDTH, HEIGHT);
-	glUseProgram(0);
+	glUseProgram(0);*/
+
+	shader shader = create_shader("src/shader.vert", "src/shader.frag");
+	//shader shader = create_shader_from_sources(vertex_shader_source, fragment_shader_source);
 
 
 	while (!glfwWindowShouldClose(window))
@@ -124,16 +152,18 @@ int main()
 		glClearColor(0.13f, 0.13f, 0.13f, 1.0f); // skybox
 		glClear(GL_COLOR_BUFFER_BIT);
 		
-		glUseProgram(shader_program);
+		//glUseProgram(shader.program);
+		use(shader);
 		
 		// set uniforms
 		float time = glfwGetTime();
-		int loc2 = glGetUniformLocation(shader_program, "time");
-		glUniform1f(loc2, time);
+		//int loc2 = glGetUniformLocation(shader.program, "time");
+		//glUniform1f(loc2, time);
+		set_float(shader.program, "time", time);
 
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices) / 3);
-		//glDrawElements(GL_TRIANGLES, sizeof(vertices) / 3, GL_UNSIGNED_INT, NULL);
+		//glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices) / 3);
+		glDrawElements(GL_TRIANGLES, sizeof(vertices) / 3, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -163,54 +193,6 @@ GLFWwindow* create_window()
 	return window;
 }
 
-int compile_shader(const char *shader_source_code, unsigned int shader_type)
-{
-	unsigned int shader;
-	shader = glCreateShader(shader_type);
-
-	glShaderSource(shader, 1, &shader_source_code, NULL);
-	glCompileShader(shader);
-
-	// Checking for compile errors in fragment shader
-	int success;
-	char info_log[512];
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
-	if (!success)
-	{
-		glGetShaderInfoLog(shader, 512, NULL, info_log);
-		printf("[ ERROR ]: Error while compiling shader: \n%s\n", info_log);
-		//std::cout << "[ ERROR ]: Error while compiling fragment shader:\n" << info_log << std::endl;
-	}
-
-	return shader;
-}
-
-int create_program(int vertex_shader, int fragment_shader)
-{
-	unsigned int shader_program = glCreateProgram();
-
-	glAttachShader(shader_program, vertex_shader);
-	glAttachShader(shader_program, fragment_shader);
-	glLinkProgram(shader_program);
-
-	// Checking for program errors
-	int success;
-	char info_log[512];
-	glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
-
-	if (!success)
-	{
-		printf("[ ERROR ]: Error while creating shader program: \n%s\n", info_log);
-		//std::cout << "[ ERROR ]: Error while linking shaders to program:\n" << info_log3 << std::endl;
-	}
-
-	glDeleteShader(vertex_shader);
-	glDeleteShader(fragment_shader);
-
-	return shader_program;
-}
-
 void process_input(GLFWwindow *window)
 {
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
@@ -233,12 +215,10 @@ void process_input(GLFWwindow *window)
 
 }
 
-
 void close_window(GLFWwindow *window)
 {
 	glfwSetWindowShouldClose(window, 1);
 }
-
 
 void framebuffer_size_callback(GLFWwindow* window, const int width, const int height) // update viewport
 {
