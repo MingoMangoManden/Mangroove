@@ -42,7 +42,6 @@ unsigned int indices[] = {
 
 int main()
 {
-	
 	glfwInit();
 
 	GLFWwindow* window = create_window();
@@ -91,37 +90,48 @@ int main()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	// compile shaders
-	/*unsigned int vertex_shader, fragment_shader;
-
-	vertex_shader = compile_shader(vertex_shader_source, GL_VERTEX_SHADER);
-	fragment_shader = compile_shader(fragment_shader_source, GL_FRAGMENT_SHADER);
-	
-	// create shader program
-	unsigned int shader_program;
-	shader_program = create_program(vertex_shader, fragment_shader);
-	
-	// static uniforms
-	glUseProgram(shader_program);
-	int loc = glGetUniformLocation(shader_program, "resolution");
-	glUniform2f(loc, WIDTH, HEIGHT);
-	glUseProgram(0);*/
 
 	shader shader = create_shader("src/shader.vert", "src/shader.frag");
-	//shader shader = create_shader_from_sources(vertex_shader_source, fragment_shader_source);
 
-
+	use(shader);
+	set_float2(shader.program, "resolution", WIDTH, HEIGHT);
+	
+	char *title_fps = malloc(25);
+	int frames = 0;
+	float old_time = glfwGetTime();
+	
 	while (!glfwWindowShouldClose(window))
 	{
-		process_input(window);
-		
+		float new_time = glfwGetTime();
+		float time_passed = new_time - old_time;
+
+		frames++;
+
+		if (time_passed > 1.0 || frames == 0)
+		{
+			float fps = frames / time_passed;
+			
+			sprintf(title_fps, "%s | %i FPS", TITLE, (int) fps);
+			glfwSetWindowTitle(window, title_fps);
+
+			frames = 0;
+			old_time = new_time;
+		}
+
 		//update();
+
+
+		process_input(window);
 
 		glClearColor(0.13f, 0.13f, 0.13f, 1.0f); // skybox
 		glClear(GL_COLOR_BUFFER_BIT);
 		
 		//glUseProgram(shader.program);
 		use(shader);
+
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
+		set_float2(shader.program, "cursor", (float) xpos, (float) ypos);
 		
 		// set uniforms
 		float time = glfwGetTime();
@@ -138,7 +148,7 @@ int main()
 
 		glUseProgram(0);
 	}
-
+	free(title_fps);
 	glfwTerminate();
 	return 0;
 }
@@ -163,7 +173,7 @@ GLFWwindow* create_window()
 
 void process_input(GLFWwindow *window)
 {
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 	{
 		close_window(window);
 	}
