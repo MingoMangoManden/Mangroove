@@ -38,7 +38,7 @@ shader create_shader_from_sources(char *v_source, char *f_source)
 
 char* get_file_contents(char *filename)
 {
-	printf("Reading from file %s\n", filename);
+	//printf("Reading from file %s\n", filename);
 
 	FILE *file;
 	file = fopen(filename, "r");
@@ -49,18 +49,16 @@ char* get_file_contents(char *filename)
 		return "";
 	}
 	
-	char *source = malloc(256*10);
+	char *source = malloc(256*10); // IMPORTANT: allocate enough memory to store file contents - produces an error if exceeds limit.
 	char line_buffer[256];
-	int line_count = 0;
 	
 	while(fgets(line_buffer, 256, file) != NULL)
 	{
 		//printf("buffer: %s\n", line_buffer);
 		strcat(source, line_buffer);
-		line_count++;
 	}
 
-	printf("File contents: \n%s\n", source);
+	//printf("File contents: \n%s\n", source);
 
 	fclose(file);
 
