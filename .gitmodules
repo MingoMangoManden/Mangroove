@@ -1,9 +1,9 @@
 [submodule "libs/glfw"]
 	path = libs/glfw
 	url = https://github.com/glfw/glfw.git
-	ignore = dirty
+	ignore = all
 
 [submodule "libs/cglm"]
 	path = libs/cglm
 	url = https://github.com/recp/cglm.git
-	ignore = dirty
+	ignore = all
