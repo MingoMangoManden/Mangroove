@@ -6,7 +6,7 @@ OS = $(shell uname)
 
 FLAGS = -g
 IFLAGS = -Ilibs/glfw/include -Ilibs/glad/include
-LDFLAGS = libs/glfw/src/libglfw3.a libs/glad/src/glad.o
+LDFLAGS = libs/glfw/src/libglfw3.a libs/glad/src/glad.o libs/cglm/libcglm.a
 
 SRC = src/*.c
 OUT = builds/Mangroove
@@ -23,37 +23,40 @@ ifneq (,$(findstring MINGW64_NT, $(OS)))
 	LDFLAGS += -lopengl32 -lgdi32
 endif
 
-#fresh: clean glfw glad all
-all: clean glfw glad engine run
+all: clean libs engine run
 
 clean:
-	$(info $(INFO) CLEANING FOR FRESHNESS)
+	@echo Cleaning project for freshness...
 	rm -rf builds
 	rm -rf libs/glad/src/glad.o
 	rm -rf libs/glfw
+	rm -rf libs/cglm
 	@echo
 
+libs: glad glfw cglm
+
 glad:
-	$(info $(INFO) COMPILING GLAD)
+	@echo Compiling glad...
 	cd libs/glad && gcc -o src/glad.o -Iinclude -c src/glad.c
 
 glfw:
-	$(info $(INFO) COMPILING GLFW)
+	@echo Compiling glfw...
 	cd libs && git clone https://github.com/glfw/glfw.git
 	cd libs/glfw && cmake . -G "Unix Makefiles" && make
 
+cglm:
+	@echo Compiling cglm...
+	cd libs && git clone https://github.com/recp/cglm.git
+	cd libs/cglm && cmake . -G "Unix Makefiles" -DCGLM_STATIC=ON && make
+
 engine:
-	$(info $(OS))
-	$(info $(INFO) COMPILING MANGROOVE)
-
+	@echo Compiling Mangroove...
 	mkdir -p builds
-
 	gcc -o $(OUT) $(SRC) $(IFLAGS) $(LDFLAGS) $(FLAGS)
-
 	@echo
 
 run:
-	$(info $(INFO) RUNNING PROGRAM)
-	$(info )
+	@echo Running Mangroove...
+	@echo
 	./$(OUT)
 	@echo

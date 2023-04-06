@@ -37,3 +37,4 @@
 #
 builds
 libs/glfw/*
+libs/cglm/*
