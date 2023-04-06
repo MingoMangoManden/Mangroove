@@ -5,7 +5,7 @@ endif
 OS = $(shell uname)
 
 FLAGS = -g
-IFLAGS = -Ilibs/glfw/include -Ilibs/glad/include
+IFLAGS = -Ilibs/glfw/include -Ilibs/glad/include -Ilibs/cglm/include
 LDFLAGS = libs/glfw/src/libglfw3.a libs/glad/src/glad.o libs/cglm/libcglm.a
 
 SRC = src/*.c
