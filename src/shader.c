@@ -51,9 +51,14 @@ char* get_file_contents(char *filename)
 	}
 	
 	char *source = malloc(256*10); // IMPORTANT: allocate enough memory to store file contents - produces an error if exceeds limit.
+	
+	// setting the first element of the string to be \0 aka end character
+	// https://stackoverflow.com/questions/1853619/strange-characters-appear-when-using-strcat-function-in-c
+	source[0] = 0;
+
 	char line_buffer[256];
 	
-	while(fgets(line_buffer, 256, file) != NULL)
+	while(fgets(line_buffer, 256, file))
 	{
 		//printf("buffer: %s\n", line_buffer);
 		strcat(source, line_buffer);
@@ -110,6 +115,8 @@ int compile_shader(const char *shader_source_code, unsigned int shader_type)
 		printf("[ ERROR ]: Error while compiling shader: \n%s\n", info_log);
 		//std::cout << "[ ERROR ]: Error while compiling fragment shader:\n" << info_log << std::endl;
 	}
+
+	printf("Shader type: %s\n", str(shader_type));
 
 	return shader;
 }
