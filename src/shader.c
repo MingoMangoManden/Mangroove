@@ -50,7 +50,7 @@ char* get_file_contents(char *filename)
 		return "";
 	}
 	
-	char *source = malloc(256*10); // IMPORTANT: allocate enough memory to store file contents - produces an error if exceeds limit.
+	char *source = malloc(256 * 10); // IMPORTANT: make sure it allocates enough memory to store file contents - produces an error if exceeds limit.
 	
 	// setting the first element of the string to be \0 aka end character
 	// https://stackoverflow.com/questions/1853619/strange-characters-appear-when-using-strcat-function-in-c
@@ -87,7 +87,6 @@ int create_program(int vertex_shader, int fragment_shader)
 	if (!success)
 	{
 		printf("[ ERROR ]: Error while creating shader program: \n%s\n", info_log);
-		//std::cout << "[ ERROR ]: Error while linking shaders to program:\n" << info_log3 << std::endl;
 	}
 
 	glDeleteShader(vertex_shader);
@@ -113,10 +112,7 @@ int compile_shader(const char *shader_source_code, unsigned int shader_type)
 	{
 		glGetShaderInfoLog(shader, 512, NULL, info_log);
 		printf("[ ERROR ]: Error while compiling shader: \n%s\n", info_log);
-		//std::cout << "[ ERROR ]: Error while compiling fragment shader:\n" << info_log << std::endl;
 	}
-
-	printf("Shader type: %s\n", str(shader_type));
 
 	return shader;
 }
