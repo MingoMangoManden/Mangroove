@@ -24,8 +24,9 @@ void main() {
 	//float pct = abs(sin(time * (st.x * st.y) * 10));
 	//float pct = abs(sin((st.x * st.y + time) * 10));
 
-	vec3 color = vec3(random(floor(st*100.0), m));
+	//vec3 color = vec3(random(floor(st*100.0), m));
+	//vec3 color = vec3(1.0f, 0.0f, 0.0f);
 
-	FragColor = vec4(color, 1.0);
+	FragColor = vec4(v_color, 1.0);
 }
 

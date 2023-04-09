@@ -4,13 +4,14 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <cglm/cglm.h>
 
 #include "main.h"
 #include "shader.h"
 
-const char *TITLE = "Mangroove v0.0.4";
-const int WIDTH = 800;
-const int HEIGHT = 800;
+#define TITLE "Mangroove v0.0.5"
+#define WIDTH 800
+#define HEIGHT 800
 
 float vertices[] = {
 	
@@ -30,7 +31,6 @@ float vertices[] = {
 
 };
 
-
 unsigned int indices[] = {
 	1, 2, 3,
 	3, 0, 1
@@ -39,6 +39,9 @@ unsigned int indices[] = {
 	/*0, 1, 2,
 	3, 2, 4*/
 };
+
+float rotation = 0.0f;
+vec4 offset = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 int main()
 {
@@ -60,8 +63,6 @@ int main()
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // update viewport when window is resized
 
 	// EBO, VBO & VAO
-	
-	// 
 	unsigned int EBO;
 	glGenBuffers(1, &EBO);
 	
@@ -71,9 +72,9 @@ int main()
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 	
-	// use VAO for VBO & EBO
+	// use VAO for VBO
 	glBindVertexArray(VAO);
-	
+
 	// vertices -> VBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -95,52 +96,58 @@ int main()
 
 	use(shader);
 	set_float2(shader.program, "resolution", WIDTH, HEIGHT);
+
+
+	/* camera */
+
+
+
+	/* end camera */
 	
 	char *title_fps = malloc(25);
 	int frames = 0;
 	float old_time = glfwGetTime();
-	
+
 	while (!glfwWindowShouldClose(window))
 	{
-		float new_time = glfwGetTime();
-		float time_passed = new_time - old_time;
-
 		frames++;
-
-		if (time_passed > 1.0 || frames == 0)
-		{
-			float fps = frames / time_passed;
-			
-			sprintf(title_fps, "%s | %i FPS", TITLE, (int) fps);
-			glfwSetWindowTitle(window, title_fps);
-
-			frames = 0;
-			old_time = new_time;
-		}
-
-		//update();
-
-
-		process_input(window);
-
-		glClearColor(0.13f, 0.13f, 0.13f, 1.0f); // skybox
-		glClear(GL_COLOR_BUFFER_BIT);
+		update_fps(window, old_time, frames, title_fps);
 		
-		//glUseProgram(shader.program);
+		// shader uniforms
 		use(shader);
 
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
 		set_float2(shader.program, "cursor", (float) xpos, (float) ypos);
 		
-		// set uniforms
 		float time = glfwGetTime();
-		//int loc2 = glGetUniformLocation(shader.program, "time");
-		//glUniform1f(loc2, time);
 		set_float(shader.program, "time", time);
+		
+		// camera
+		mat4 trans;
+		glm_mat4_identity(trans);
+
+		glm_rotate(trans, glm_rad(rotation), GLM_ZUP);
+		/*glm_scale(trans, (vec3)
+				{ sin(glfwGetTime()), sin(glfwGetTime()), sin(glfwGetTime()) }
+		);*/
+		vec3 scale = { 0.5f, 0.5f, 0.5f };
+		glm_scale(trans, scale);
+
+		//vec = trans * vec;
+		glm_translate(trans, offset);
+		//rotation += -1.0f;
+		//printf("%f, %f, %f\n", vec[0], vec[1], vec[2]);
+
+		set_matrix4fv(shader.program, "transform", &trans);
+
+
+		process_input(window);
+
+		glClearColor(0.13f, 0.13f, 0.13f, 1.0f); // skybox
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		glBindVertexArray(VAO);
-		//glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices) / 3);
 		glDrawElements(GL_TRIANGLES, sizeof(vertices) / 3, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
@@ -148,9 +155,26 @@ int main()
 
 		glUseProgram(0);
 	}
+
 	free(title_fps);
 	glfwTerminate();
+
 	return 0;
+}
+
+void update_fps(GLFWwindow* window, float old_time, int frames, char *title_fps)
+{
+	float new_time = glfwGetTime();
+	float time_passed = new_time - old_time;
+
+	if (time_passed > 1.0 || frames == 0)
+	{
+		float fps = frames / time_passed;
+		sprintf(title_fps, "%s | %i FPS", TITLE, (int) fps);
+		glfwSetWindowTitle(window, title_fps);
+		frames = 0;
+		old_time = new_time;
+	}
 }
 
 GLFWwindow* create_window()
@@ -179,16 +203,40 @@ void process_input(GLFWwindow *window)
 	}
 	
 	static bool lock = false, wf_mode = false;
-	if (!glfwGetKey(window, GLFW_KEY_W))
+	if (!glfwGetKey(window, GLFW_KEY_E))
 	{
 		lock = false;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && lock == false)
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && lock == false)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, (wf_mode) ? GL_LINE : GL_FILL);
 		wf_mode = !wf_mode;
 		lock = true;
+	}
+
+	/* Controls */
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		offset[1] += 0.01f;
+
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		offset[1] -= 0.01f;
+
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		offset[0] -= 0.01f;
+
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		offset[0] += 0.01f;
+
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+	{
+		rotation += 10.0f;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+	{
+		rotation -= 1.0f;
 	}
 
 }

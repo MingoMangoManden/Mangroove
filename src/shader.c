@@ -5,6 +5,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <cglm/cglm.h>
 
 #include "shader.h"
 
@@ -134,6 +135,12 @@ void set_float2(int shader_program, const char *name, float value1, float value2
 {
 	int loc = glGetUniformLocation(shader_program, name);
 	glUniform2f(loc, value1, value2);
+}
+
+void set_matrix4fv(int shader_program, const char *name, mat4 *matrix)
+{
+	int loc = glGetUniformLocation(shader_program, name);
+	glUniformMatrix4fv(loc, 1, GL_FALSE, (float *) matrix);
 }
 
 void set_int(int shader_program, const char *name, int value)

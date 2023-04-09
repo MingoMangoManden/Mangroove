@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cglm/cglm.h>
+
 typedef struct
 {
 	unsigned int program;
@@ -18,4 +20,5 @@ int compile_shader(const char *shader_source_code, unsigned int shader_type);
 void set_bool(int shader_program, const char *name, bool value);
 void set_float(int shader_program, const char *name, float value);
 void set_float2(int shader_program, const char *name, float value1, float value2);
+void set_matrix4fv(int shader_program, const char *name, mat4 *matrix);
 void set_int(int shader_program, const char *name, int value);
