@@ -8,8 +8,9 @@
 
 #include "main.h"
 #include "shader.h"
+#include "camera.h"
 
-#define TITLE "Mangroove v0.0.5"
+#define TITLE "Mangroove v0.0.6"
 #define WIDTH 800
 #define HEIGHT 800
 
@@ -20,24 +21,12 @@ float vertices[] = {
     1.0f, -1.0f, 0.0f,   0.0f, 1.0f, 0.0f, // bottom right
     -1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f, // bottom left
     -1.0f, 1.0f, 0.0f,   0.0f, 1.0f, 1.0f, // top left
-	
-	// ><
-	// vertices          // colors
-	/*-1.0f, 1.0f, 0.0f,   1.0f, 0.0f, 0.0f, // top left
-	-1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f, // bottom left
-	0.0f, 0.0f, 0.0f,    0.0f, 0.0f, 1.0f, // middle --
-	1.0f, 1.0f, 0.0f,    1.0f, 0.0f, 0.0f, // top right
-	1.0f, -1.0f, 0.0f,    0.0f, 1.0f, 0.0f // bottom right*/
 
 };
 
 unsigned int indices[] = {
 	1, 2, 3,
 	3, 0, 1
-
-	// ><
-	/*0, 1, 2,
-	3, 2, 4*/
 };
 
 float rotation = 0.0f;
@@ -98,22 +87,17 @@ int main()
 	set_float2(shader.program, "resolution", WIDTH, HEIGHT);
 
 
-	/* camera */
-
-
-
-	/* end camera */
-	
 	char *title_fps = malloc(25);
 	int frames = 0;
 	float old_time = glfwGetTime();
 
 	while (!glfwWindowShouldClose(window))
 	{
+		/* framerate counter */
 		frames++;
 		update_fps(window, old_time, frames, title_fps);
 		
-		// shader uniforms
+		/* shader uniforms */
 		use(shader);
 
 		double xpos, ypos;
@@ -123,33 +107,30 @@ int main()
 		float time = glfwGetTime();
 		set_float(shader.program, "time", time);
 		
-		// camera
-		mat4 trans;
-		glm_mat4_identity(trans);
+		/* camera */
+		Camera cam = create_camera();
 
-		glm_rotate(trans, glm_rad(rotation), GLM_ZUP);
-		/*glm_scale(trans, (vec3)
-				{ sin(glfwGetTime()), sin(glfwGetTime()), sin(glfwGetTime()) }
-		);*/
-		vec3 scale = { 0.5f, 0.5f, 0.5f };
-		glm_scale(trans, scale);
+		rotate_camera(&cam, GLM_ZUP, rotation);
+		rotate_camera(&cam, GLM_XUP, rotation);
 
-		//vec = trans * vec;
-		glm_translate(trans, offset);
-		//rotation += -1.0f;
-		//printf("%f, %f, %f\n", vec[0], vec[1], vec[2]);
+		scale_camera(&cam);
 
-		set_matrix4fv(shader.program, "transform", &trans);
+		glm_translate(cam.transform, offset);
+		rotation += -0.5f;
 
-
+		set_matrix4fv(shader.program, "transform", &cam.transform);
+		
+		/* predraw */
 		process_input(window);
-
+		
+		/* draw */
 		glClearColor(0.13f, 0.13f, 0.13f, 1.0f); // skybox
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, sizeof(vertices) / 3, GL_UNSIGNED_INT, 0);
-
+		
+		/* cleanup */
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
